@@ -1,0 +1,43 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Video Player Lab — static portfolio prototype"><title>Player concept — Video Player Lab</title><link rel="stylesheet" href="assets/css/styles.css"></head><body class="player-page">
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="Video Player Lab home"><span class="brand-mark">VPL</span><span class="brand-name">Video Player Lab</span></a>
+  <nav class="desktop-nav" aria-label="Primary">
+    <a href="index.html" data-i18n="nav.home">Home</a>
+    <a href="players.html" data-i18n="nav.players">Players</a>
+    <a href="case-study.html" data-i18n="nav.case">Case study</a>
+    <a href="about.html" data-i18n="nav.about">About</a>
+    <a href="contact.html" data-i18n="nav.contact">Contact</a>
+  </nav>
+  <div class="header-actions">
+    <div class="language-switcher" aria-label="Language">
+      <button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button><button type="button" data-lang="ky">KY</button>
+    </div>
+    <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Open menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+</header>
+<nav class="mobile-nav" data-mobile-nav>
+  <a href="index.html" data-i18n="nav.home">Home</a><a href="players.html" data-i18n="nav.players">Players</a><a href="case-study.html" data-i18n="nav.case">Case study</a><a href="about.html" data-i18n="nav.about">About</a><a href="contact.html" data-i18n="nav.contact">Contact</a>
+</nav>
+<main>
+<section class="player-detail section-shell" data-player-detail>
+  <div class="player-detail-head"><p class="eyebrow"><span data-player-number>01</span> / player concept</p><h1 data-player-title>Cinema player</h1><p data-player-body></p></div>
+  <div class="detail-player-wrap">
+<div class="custom-player" data-custom-player>
+  <video data-player-poster preload="metadata" poster="assets/img/poster-cinema.svg">
+    <source src="https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4" type="video/mp4">
+  </video>
+  <button class="player-center" type="button" data-play aria-label="Play"><span data-play-icon><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></button>
+  <div class="player-bar">
+    <button type="button" data-play aria-label="Play"><span data-play-icon><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></button>
+    <div class="player-progress" data-progress><span></span></div>
+    <button type="button" data-volume aria-label="Volume"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4zM16 9c1.2.8 2 1.8 2 3s-.8 2.2-2 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button type="button" data-fullscreen aria-label="Fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4M16 4h4v4M20 16v4h-4M4 16v4h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+</div>
+</div>
+  <div class="detail-grid"><div><span class="detail-label">Use case</span><strong data-player-tag>16:9 / cinematic</strong></div><div><span class="detail-label">Focus</span><strong>Hierarchy & controls</strong></div><div><span class="detail-label">Next build</span><strong>React + Video.js v10</strong></div></div>
+  <section class="detail-notes"><div><p class="eyebrow">Design note</p><h2>Built around viewing intent, not decorative effects.</h2></div><div><p>The layout keeps the content frame dominant. Controls sit on a quiet baseline, and all secondary information moves outside the player instead of competing with the video.</p><p>In the Next.js version, the player becomes a reusable component with typed props, clean lifecycle management and separate UI states.</p></div></section>
+</section>
+</main>
+<footer class="site-footer"><div><strong>Video Player Lab</strong><p data-i18n="footer.note">Static design prototype • EN / RU / KY</p></div><div class="footer-links"><a href="players.html">Players</a><a href="case-study.html">Case study</a><a href="contact.html">Contact</a></div></footer>
+<script src="assets/js/app.js"></script></body></html>
