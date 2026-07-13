@@ -19,7 +19,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  line-height: 1.55;
+  line-height: 1.55;overflow-x: hidden;
 }
 a {
   color: inherit;
@@ -66,11 +66,11 @@ h3 {
   letter-spacing: -0.035em;
 }
 h1 {
-  font-size: clamp(54px, 8vw, 120px);
+  font-size: clamp(54px, 5vw, 120px);
   font-weight: 600;
 }
 h2 {
-  font-size: clamp(38px, 5vw, 76px);
+  font-size: clamp(28px, 5vw, 76px);
   font-weight: 600;
 }
 .button {

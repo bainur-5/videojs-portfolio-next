@@ -26,6 +26,7 @@
 .heroCopy h1 {
   font-weight: 400;
   margin-bottom: 28px;
+  font-size: clamp(24px, 4vw, 78px) !important;
 }
 .heroLead {
   max-width: 620px;
@@ -117,6 +118,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 30px;
+  flex-wrap: wrap;
 }
 .contactStrip h2 {
   margin-bottom: 12px;
@@ -315,6 +317,9 @@
     grid-template-columns: 1fr;
     padding: 70px 0;
   }
+  .heroCopy {
+    max-width: fit-content;
+  }
   .heroPlayer {
     width: 100%;
   }
@@ -349,7 +354,11 @@
     grid-template-columns: 1fr;
   }
   .aboutGrid .aboutLarge {
-    min-height: 420px;
+    min-height: auto;
+    padding-top: 40px;
+  }
+  .aboutLarge h2 {
+    font-size: clamp(28px, 5vw, 86px);
   }
   .contactLayout aside {
     border-left: 0;
@@ -395,13 +404,14 @@
     width: 64px;
     height: 64px;
     flex: 0 0 auto;
+    margin-left: auto;
   }
   .pageHero {
     padding: 75px 0 50px;
     margin-left: 14px;
   }
   .pageHero h1 {
-    font-size: clamp(54px, 18vw, 90px);
+    font-size: clamp(32px, 8vw, 90px);
   }
   .detailNotes {
     gap: 22px;
@@ -421,4 +431,20 @@
   .contactLayout {
     gap: 50px;
   }
+  .contactLayout aside h2{
+    font-size: 28px;
+  }
+  .caseLayout h2{
+    font-size: 28px;
+    margin-top: 24px;
+  }
+  .caseLayout article {
+    padding: 24px 20px;
+  }
+  .aboutGrid h3 {
+    font-size: 24px;
+  }
+  .aboutGrid article{
+    padding-inline: 14px;
+  } 
 }
