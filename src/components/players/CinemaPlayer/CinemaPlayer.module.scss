@@ -1,0 +1,13 @@
+.player{
+  --cinema-accent: #f43f5e;
+  --cinema-fg: #fff;
+  --cimema-muted: rgb(255 255 255 / 70%);
+  --cinema-panel: rgb(8 8 10 / 76%);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  color: var(--cinema-fg);
+}

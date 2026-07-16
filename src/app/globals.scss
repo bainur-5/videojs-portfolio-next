@@ -1,3 +1,4 @@
+
 :root {
   --bg: #f3efe6;
   --surface: #fffdf8;
@@ -19,7 +20,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  line-height: 1.55;overflow-x: hidden;
+  line-height: 1.55;
 }
 a {
   color: inherit;

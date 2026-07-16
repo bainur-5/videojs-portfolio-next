@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans, Noto_Serif } from "next/font/google";
 import { headers } from "next/headers";
+import "@videojs/react/video/skin.css";
 import "./globals.scss";
 
 const notoSans = Noto_Sans({
