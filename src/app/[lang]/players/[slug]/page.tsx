@@ -34,7 +34,27 @@ export default async function PlayerPage({
         <p>{content.body}</p>
       </div>
       {
-        slug === "cinema" && <CinemaPlayer src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2 " title="Title" /> ||
+        slug === "cinema" &&
+        <CinemaPlayer
+          src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4"
+          poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2"
+          posterAlt="Mountain landscape from the cinema player demo"
+          eyebrow="Original short film"
+          title="Beyond the Ridge"
+          badge="4K"
+          captions={[
+            {
+              src: '/media/cinema-en.vtt',
+              srcLang: 'en',
+              label: 'English',
+              default: true,
+            },
+          ]}
+          labels={{
+            player: 'Cinema player demo',
+            controls: 'Video controls',
+          }}
+        /> ||
         <DemoPlayer poster={player.poster} labels={d.common} />
       }
       <div className={styles.detailGrid}>

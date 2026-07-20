@@ -1,8 +1,9 @@
+'use client';
 
 import { CinemaPlayerLabels, CinemaPlayerProps } from "@/types/content"
 import cls from "./CinemaPlayer.module.scss"
-import { BufferingIndicator, CaptionsButton, Controls, createPlayer, FullscreenButton, Gesture, Hotkey, MuteButton, PiPButton, PlaybackRateButton, PlayButton, Poster, SeekButton, SeekIndicator, StatusAnnouncer, StatusIndicator, Time, TimeSlider, videoFeatures, VolumeSlider } from "@videojs/react";
-import { Video } from "@videojs/react/video";
+import { BufferingIndicator, CaptionsButton, Controls, createPlayer, FullscreenButton, Gesture, Hotkey, MuteButton, PiPButton, PlaybackRateButton, PlayButton, Poster, SeekButton, SeekIndicator, StatusAnnouncer, StatusIndicator, Time, TimeSlider, VolumeSlider } from "@videojs/react";
+import { Video, videoFeatures } from "@videojs/react/video";
 import { CaptionsOffIcon, CaptionsOnIcon, FullscreenEnterIcon, FullscreenExitIcon, PauseIcon, PipEnterIcon, RestartIcon, SeekIcon, SpinnerIcon, VolumeHighIcon, VolumeLowIcon, VolumeOffIcon } from "@videojs/react/icons/minimal";
 import { PlayIcon } from "@/components/ui/Icons";
 import { PipExitIcon } from "@videojs/react/icons";
@@ -48,21 +49,13 @@ export function CinemaPlayer({
 }: CinemaPlayerProps) {
 
   const labels = { ...DEFAULT_LABELS, ...labelsOverride };
-  const rootClassName = [cls.root, className].filter(Boolean).join(" ");
+  const rootClassName = [cls.player, className].filter(Boolean).join(" ");
 
   return (
     <Player.Provider>
       <Player.Container
         className={rootClassName}
-        aria-label={labels.player}
-        tabIndex={0}
-        onKeyDownCapture={(event) => {
-          console.log({
-            key: event.key,
-            code: event.code,
-            activeElement: document.activeElement,
-          });
-        }}>
+        aria-label={labels.player}>
         <Video
           className={cls.video}
           src={src}
@@ -172,7 +165,7 @@ export function CinemaPlayer({
                 </SeekButton>
 
                 <div className={cls.volumeControl}>
-                  <MuteButton className={`${cls.iconButtom} ${cls.muteButton}`} label={labels.mute}>
+                  <MuteButton className={`${cls.iconButton} ${cls.muteButton}`} label={labels.mute}>
                     <VolumeOffIcon className={cls.volumeOffIcon} />
                     <VolumeLowIcon className={cls.volumeLowIcon} />
                     <VolumeHighIcon className={cls.volumeHighIcon} />
@@ -189,11 +182,11 @@ export function CinemaPlayer({
                   </VolumeSlider.Root>
                 </div>
 
-                <Time.Group className={cls.timeGroup}>
-                  <Time.Value type="current" className={cls.timeValue} />
-                  <Time.Separator className={cls.timeSeparator} />
-                  <Time.Value type="duration" className={cls.timeValue} />
-                </Time.Group>
+                  <Time.Group className={cls.timeGroup}>
+                    <Time.Value type="current" className={cls.timeValue} />
+                    <Time.Separator className={cls.timeSeparator} />
+                    <Time.Value type="duration" className={cls.timeValue} />
+                  </Time.Group>
               </div>
 
               <div className={cls.rightControls}>
@@ -249,9 +242,9 @@ export function CinemaPlayer({
 
         {/** Горячие клавиши, привязанные к действиям текущего Provider. */}
         <Hotkey keys="=" action="togglePaused" target="player" />
-        <Hotkey keys="s" action="togglePaused" target="player" />
-        <Hotkey keys="a" action="seekStep" value={-SEEK_SECONDS} />
-        <Hotkey keys="d" action="seekStep" value={SEEK_SECONDS} />
+        <Hotkey keys="k" action="togglePaused" />
+        <Hotkey keys="j" action="seekStep" value={-SEEK_SECONDS} />
+        <Hotkey keys="l" action="seekStep" value={SEEK_SECONDS} />
         <Hotkey keys="ArrowLeft" action="seekStep" value={-5} />
         <Hotkey keys="ArrowRight" action="seekStep" value={5} />
         <Hotkey keys="ArrowUp" action="volumeStep" value={0.05} />
@@ -262,6 +255,14 @@ export function CinemaPlayer({
         <Hotkey keys="f" action="toggleFullscreen" />
         <Hotkey keys="0-9" action="seekToPercent" />
 
+        
+        <Hotkey keys="л" action="togglePaused" />
+        <Hotkey keys="о" action="seekStep" value={-SEEK_SECONDS} />
+        <Hotkey keys="д" action="seekStep" value={SEEK_SECONDS} />
+        <Hotkey keys="ь" action="toggleMuted" />
+        <Hotkey keys="с" action="toggleSubtitles" />
+        <Hotkey keys="ш" action="togglePictureInPicture" />
+        <Hotkey keys="а" action="toggleFullscreen" />
         {/** Озвучивает изменения состояния для screen reader. */}
         <StatusAnnouncer />
 

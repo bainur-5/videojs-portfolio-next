@@ -1,3 +1,3 @@
-import { CinemaPlayer } from "./CinemaPlayer.commented";
+import { CinemaPlayer } from "./CinemaPlayer";
 
 export default CinemaPlayer 
