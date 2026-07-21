@@ -96,3 +96,40 @@ export type Dictionary = {
 };
 
 export type PlayerSlug = "cinema" | "course" | "live" | "product";
+
+
+export interface CinemaCaptionTrack {
+  src: string;
+  srcLang: string;
+  label: string;
+  default?: boolean;
+}
+
+export interface CinemaPlayerLabels {
+  player: string;
+  controls: string;
+  playPause: string;
+  seekBackward: string;
+  seekForward: string;
+  mute: string;
+  captions: string;
+  playbackRate: string;
+  pictureInPicture: string;
+  fullscreen: string;
+  timeline: string;
+  volume: string;
+}
+
+export interface CinemaPlayerProps {
+  src: string;
+  poster?: string;
+  posterAlt?: string;
+  title: string;
+  eyebrow?: string;
+  badge?: string;
+  className?: string;
+  autoPlay?: boolean;
+  muted?: boolean;
+  captions?: readonly CinemaCaptionTrack[];
+  labels?: Partial<CinemaPlayerLabels>;
+}

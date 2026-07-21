@@ -1,0 +1,896 @@
+.player {
+  --cinema-accent: #f43f5e;
+  --cinema-fg: #fff;
+  --cimema-muted: rgb(255 255 255 / 70%);
+  --cinema-panel: rgb(8 8 10 / 76%);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  color: var(--cinema-fg);
+  background: #050506;
+  border-radius: 30px;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 24%);
+  isolation: isolate;
+  container: cinema-player / inline-size;
+
+  &:focus-visible {
+    // outline: 2px solid var(--cinema-accent);
+    outline: none;
+    outline-offset: 3px;
+  }
+
+  .video,
+  .poster {
+    /* Видео и обложка полностью занимают площадь корневого контейнера. */
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video {
+    /* Чёрный фон скрывает возможную вспышку до загрузки первого кадра. */
+    background: #050506;
+  }
+
+  .poster {
+    /* Poster лежит над видео до начала воспроизведения. */
+    z-index: 1;
+    transition: opacity 300ms ease;
+
+    /* Video.js снимает data-visible, когда обложку нужно скрыть. */
+    &:not([data-visible]) {
+      pointer-events: none;
+      opacity: 0;
+    }
+  }
+
+  .topScrim,
+  .bottomScrim {
+    position: absolute;
+    inset-inline: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .topScrim {
+    top: 0;
+    height: 38%;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 60%), transparent);
+  }
+  .bottomScrim {
+    bottom: 0;
+    height: 58%;
+    background: linear-gradient(to top, rgb(0 0 0 / 88%), transparent);
+  }
+
+  /* ================================================================
+   * МЕТАДАННЫЕ ФИЛЬМА
+   * ================================================================ */
+  .metadata {
+    /* Название, eyebrow и badge располагаются поверх верхнего градиента. */
+    position: absolute;
+    inset: clamp(16px, 3vw, 34px) clamp(16px, 3vw, 38px) auto;
+    z-index: 4;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    pointer-events: none;
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease;
+
+    .eyebrow {
+      /* Небольшая надпись над названием: категория, серия или коллекция. */
+      margin: 0 0 5px;
+      font-size: clamp(9px, 1.2vw, 12px);
+      font-weight: 650;
+      letter-spacing: 0.14em;
+      color: rgb(255 255 255 / 62%);
+      text-transform: uppercase;
+    }
+
+    .title {
+      /* Основное название ограничено одной строкой и не ломает layout. */
+      margin: 0;
+      max-width: 28ch;
+      overflow: hidden;
+      font-size: clamp(16px, 2.2vw, 27px);
+      font-weight: 580;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 2px 18px rgb(0 0 0 / 55%);
+    }
+
+    .badge {
+      /* Короткий бейдж качества: 4K, HD и т. п. */
+      flex: 0 0 auto;
+      padding: 5px 7px;
+      font-size: 10px;
+      font-weight: 750;
+      line-height: 1;
+      letter-spacing: 0.08em;
+      border: 1px solid rgb(255 255 255 / 45%);
+      border-radius: 3px;
+      background: rgb(0 0 0 / 22%);
+      backdrop-filter: blur(12px);
+    }
+  }
+
+  .buffering {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 8;
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    color: white;
+    background: rgb(0 0 0 / 48%);
+    border: 1px solid rgb(255 255 255 / 14%);
+    border-radius: 50%;
+    backdrop-filter: blur(12px);
+    &:not([data-visible]) {
+      display: none;
+    }
+    .spinnerIcon {
+      width: 26px;
+      height: 26px;
+      animation: spin 850ms linear infinite;
+    }
+  }
+
+  .centerPlayButton {
+    /* Крупная стартовая кнопка — главный CTA до первого запуска видео. */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 7;
+    display: grid;
+    width: clamp(62px, 8vw, 92px);
+    height: clamp(62px, 8vw, 92px);
+    padding: 0;
+    place-items: center;
+    color: #09090b;
+    cursor: pointer;
+    background: rgb(255 255 255 / 94%);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: 0 18px 45px rgb(0 0 0 / 36%);
+    transform: translate(-50%, -50%);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      background 180ms ease;
+
+    &:hover {
+      background: #fff;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    &:active {
+      transform: translate(-50%, -50%) scale(0.97);
+    }
+
+    /* После первого запуска Video.js добавляет data-started. */
+    &[data-started] {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    svg {
+      width: 36%;
+      height: 36%;
+    }
+  }
+
+  /*
+   * Общая логика иконок play / pause / restart.
+   * Класс playStateButton используется и у центральной, и у нижней кнопки.
+   */
+  .playStateButton {
+    .playIcon,
+    .pauseIcon,
+    .restartIcon {
+      display: none;
+    }
+
+    &[data-paused]:not([data-ended]) {
+      .playIcon {
+        display: block;
+      }
+    }
+
+    &:not([data-paused]) {
+      .pauseIcon {
+        display: block;
+      }
+    }
+
+    &[data-ended] {
+      .restartIcon {
+        display: block;
+      }
+    }
+  }
+
+  /* ================================================================
+   * ПАНЕЛЬ УПРАВЛЕНИЯ
+   * ================================================================ */
+  .controls {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+
+    &:not([data-visible]) {
+      opacity: 0;
+
+      & ~ .inputFeedback {
+        pointer-events: none;
+      }
+    }
+
+    .controlsPanel {
+      width: 100%;
+      padding: 0 clamp(14px, 2.7vw, 32px) clamp(14px, 2.4vw, 27px);
+      pointer-events: auto;
+
+      .timeSlider {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 22px;
+        align-items: center;
+        cursor: pointer;
+        touch-action: none;
+
+        .timeTrack {
+          /* Базовая дорожка прогресса. */
+          position: absolute;
+          inset-inline: 0;
+          height: 3px;
+          overflow: hidden;
+          background: rgb(255 255 255 / 26%);
+          border-radius: 999px;
+          transition: height 150ms ease;
+
+          .timeBuffer,
+          .timeFill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            border-radius: inherit;
+          }
+
+          .timeBuffer {
+            /* Уже загруженная браузером часть видео. */
+            width: var(--media-slider-buffer);
+            background: rgb(255 255 255 / 40%);
+          }
+
+          .timeFill {
+            /* Уже просмотренная пользователем часть видео. */
+            width: var(--media-slider-fill);
+            background: var(--cinema-accent);
+          }
+        }
+
+        .timeThumb {
+          /* Подвижная точка текущего положения на timeline. */
+          position: absolute;
+          left: var(--media-slider-fill);
+          width: 13px;
+          height: 13px;
+          background: var(--cinema-accent);
+          border: 2px solid #fff;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgb(0 0 0 / 45%);
+          transform: translateX(-50%) scale(0);
+          transition: transform 150ms ease;
+        }
+
+        .timePreview {
+          /* Всплывающее время под курсором при наведении на timeline. */
+          position: absolute;
+          bottom: 100%;
+          left: var(--media-slider-buffer);
+          margin-bottom: 7px;
+          pointer-events: none;
+          opacity: 0;
+          transform: translateX(-50%) translateY(4px);
+          transition:
+            opacity 140ms ease,
+            transform 140ms ease;
+
+          .timePreviewValue {
+            display: block;
+            padding: 6px 8px;
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+            color: #fff;
+            white-space: nowrap;
+            background: rgb(8 8 10 / 92%);
+            border: 1px solid rgb(255 255 255 / 12%);
+            border-radius: 5px;
+            box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+          }
+        }
+
+        /* При hover/drag timeline становится заметнее. */
+        &[data-interactive],
+        &[data-dragging] {
+          .timeTrack {
+            height: 5px;
+          }
+
+          .timeThumb {
+            transform: translateX(-50%) scale(1);
+          }
+        }
+
+        /* Во время перетаскивания используем позицию указателя. */
+        &[data-dragging] {
+          .timeTrack {
+            .timeFill {
+              width: var(--media-slider-pointer);
+            }
+          }
+
+          .timeThumb {
+            left: var(--media-slider-pointer);
+          }
+        }
+
+        /* Preview показывается при наведении или drag. */
+        &[data-pointing],
+        &[data-dragging] {
+          .timePreview {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+      }
+
+      /* ------------------------------------------------------------
+       * НИЖНЯЯ СТРОКА КНОПОК
+       * ------------------------------------------------------------ */
+      .bottomBar {
+        display: flex;
+        min-height: 40px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-top: 5px;
+
+        .leftControls,
+        .rightControls,
+        .volumeControls,
+        .trimeGroup {
+          display: flex;
+          align-items: center;
+        }
+
+        .leftControls,
+        .rightControls {
+          gap: clamp(3px, 0.7vw, 9px);
+        }
+
+        .iconButton,
+        .rateButton {
+          flex: 0 0 auto;
+          display: grid;
+          height: 38px;
+          padding: 0;
+          place-items: center;
+          color: #fff;
+          cursor: pointer;
+          background: transparent;
+          border: 0;
+          border-radius: 50%;
+          transition:
+            color 150ms ease,
+            background 150ms ease,
+            transform 150ms ease;
+
+          &:hover,
+          &:focus-visible {
+            color: #fff;
+            background: rgb(255 255 255 / 12%);
+          }
+
+          &:active {
+            transform: scale(0.92);
+          }
+
+          &:focus-visible {
+            outline: 2px solid rgb(255 255 255 / 85%);
+            outline-offset: 1px;
+          }
+        }
+
+        .iconButton {
+          width: 38px;
+
+          svg {
+            width: 21px;
+            height: 21px;
+          }
+        }
+
+        .rateButton {
+          min-width: 42px;
+          padding-inline: 7px;
+          font-size: 12px;
+          font-weight: 720;
+          font-variant-numeric: tabular-nums;
+          border-radius: 7px;
+        }
+
+        /* ----------------------------------------------------------
+         * КНОПКИ ПЕРЕМОТКИ
+         * ---------------------------------------------------------- */
+
+        .seekButton {
+          .seekIconWrap {
+            position: relative;
+            display: grid;
+            width: 23px;
+            height: 23px;
+            place-items: center;
+
+            .controlIcon {
+              width: 23px !important;
+              height: 23px !important;
+            }
+
+            .seekIconBackward {
+              transform: scaleX(-1);
+            }
+
+            .seekNumber {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -47%);
+              font-size: 7px;
+              font-weight: 800;
+              line-height: 1;
+            }
+          }
+        }
+
+        /* ----------------------------------------------------------
+         * ГРОМКОСТЬ
+         * ---------------------------------------------------------- */
+
+        .volumeControl {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+
+          .muteButton {
+            /* Иконки громкости переключаются по data-volume-level. */
+            .volumeOffIcon,
+            .volumeLowIcon,
+            .volumeHighIcon {
+              display: none;
+            }
+
+            &[data-volume-level="off"] {
+              .volumeOffIcon {
+                display: block;
+              }
+            }
+
+            &[data-volume-level="low"],
+            &[data-volume-level="medium"] {
+              .volumeLowIcon {
+                display: block;
+              }
+            }
+
+            &[data-volume-level="high"] {
+              .volumeHighIcon {
+                display: block;
+              }
+            }
+          }
+
+          .volumeSlider {
+            /* По умолчанию скрыт и раскрывается при hover/focus/drag. */
+            position: relative;
+            width: 0;
+            height: 24px;
+            overflow: visible;
+            cursor: pointer;
+            opacity: 0;
+            transition:
+              width 180ms ease,
+              opacity 150ms ease;
+            touch-action: none;
+
+            .volumeTrack {
+              position: absolute;
+              inset: 50% 0 auto;
+              height: 3px;
+              background: rgb(255 255 255 / 28%);
+              border-radius: 999px;
+              transform: translateY(-50%);
+
+              .volumeFill {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: var(--media-slider-fill);
+                height: 100%;
+                background: #fff;
+                border-radius: inherit;
+              }
+            }
+
+            .volumeThumb {
+              position: absolute;
+              top: 50%;
+              left: var(--media-slider-fill);
+              width: 10px;
+              height: 10px;
+              background: #fff;
+              border-radius: 50%;
+              transform: translate(-50%, -50%) scale(0);
+            }
+
+            &[data-interactive],
+            &[data-dragging] {
+              .volumeThumb {
+                transform: translate(-50%, -50%) scale(1);
+              }
+            }
+          }
+
+          &:hover,
+          &:focus-within {
+            .volumeSlider {
+              width: 72px;
+              margin-right: 5px;
+              opacity: 1;
+            }
+          }
+
+          .volumeSlider[data-dragging] {
+            width: 72px;
+            margin-right: 5px;
+            opacity: 1;
+          }
+        }
+
+        /* ----------------------------------------------------------
+         * ВРЕМЯ
+         * ---------------------------------------------------------- */
+
+        .timeGroup {
+          gap: 4px;
+          margin-left: 2px;
+          font-size: clamp(10px, 1.3vw, 12px);
+          font-variant-numeric: tabular-nums;
+          color: var(--cinema-muted);
+          white-space: nowrap;
+
+          .timeSeparator {
+            color: rgb(255 255 255 / 36%);
+          }
+        }
+
+        /* ----------------------------------------------------------
+         * СУБТИТРЫ
+         * ---------------------------------------------------------- */
+        .captionsButton {
+          .captionsOffIcon,
+          .captionsOnIcon {
+            display: none;
+          }
+
+          &:not([data-active]) {
+            .captionsOffIcon {
+              display: block;
+            }
+          }
+
+          &[data-active] {
+            .captionsOnIcon {
+              display: block;
+            }
+          }
+
+          &[data-availability="unavailable"] {
+            display: none;
+          }
+        }
+
+        /* ----------------------------------------------------------
+         * PICTURE-IN-PICTURE
+         * ---------------------------------------------------------- */
+        .pipButton {
+          .pipEnterIcon,
+          .pipExitIcon {
+            display: none;
+          }
+
+          &:not([data-pip]) {
+            .pipEnterIcon {
+              display: block;
+            }
+          }
+
+          &[data-pip] {
+            .pipExitIcon {
+              display: block;
+            }
+          }
+
+          &[data-availability="unsupported"] {
+            display: none;
+          }
+        }
+        /* ----------------------------------------------------------
+         * FULLSCREEN
+         * ---------------------------------------------------------- */
+
+        .fullscreenButton {
+          .fullscreenEnterIcon,
+          .fullscreenExitIcon {
+            display: none;
+          }
+
+          &:not([data-fullscreen]) {
+            .fullscreenEnterIcon {
+              display: block;
+            }
+          }
+
+          &[data-fullscreen] {
+            .fullscreenExitIcon {
+              display: block;
+            }
+          }
+
+          &[data-availability="unsupported"] {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  /* ================================================================
+   * ВИЗУАЛЬНАЯ ОБРАТНАЯ СВЯЗЬ ДЛЯ HOTKEY И GESTURE
+   * ================================================================ */
+
+  .inputFeedback {
+    /* Слой не мешает кликам и делит плеер на левую/центр/правую зоны. */
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    pointer-events: none;
+
+    .playFeedback,
+    .seekFeedback {
+      display: grid;
+      place-items: center;
+      color: #fff;
+      text-align: center;
+    }
+
+    .playFeedback {
+      /* Центральная анимация после play/pause. */
+      grid-column: 2;
+      justify-self: center;
+      width: 68px;
+      height: 68px;
+      background: rgb(0 0 0 / 48%);
+      border: 1px solid rgb(255 255 255 / 14%);
+      border-radius: 50%;
+      backdrop-filter: blur(10px);
+      transition:
+        opacity 170ms ease,
+        scale 170ms ease;
+
+      &[data-starting-style],
+      &[data-ending-style] {
+        opacity: 0;
+        scale: 0.84;
+      }
+
+      svg {
+        display: none;
+        width: 28px;
+        height: 28px;
+      }
+
+      &[data-status="play"] {
+        .feedbackPlayIcon {
+          display: block;
+        }
+      }
+      &[data-status="pause"] {
+        .feedbackPauseIcon {
+          display: block;
+        }
+      }
+    }
+
+    .seekFeedback {
+      /* Индикатор перемотки появляется слева или справа. */
+      grid-row: 1;
+      align-self: center;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 4px;
+      min-width: 88px;
+      padding: 14px 15px;
+      font-size: 720;
+      background: rgb(0 0 0 / 40%);
+      border: 1px solid rgb(255 255 255 / 12%);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      transition:
+        opacity 170ms ease,
+        transform 170ms ease;
+
+      /* Поддерживаются оба имени из разных вариантов TSX-файла. */
+      .feedbackSeekIcon,
+      .seekIcon {
+        display: none;
+        width: 24px;
+        height: 24px;
+        padding: 2px 0;
+      }
+
+      .feedbackValue {
+        font-variant-numeric: tabular-nums;
+      }
+
+      &[data-direction] {
+        .feedbackSeekIcon,
+        .seekIcon {
+          display: block;
+        }
+      }
+
+      &[data-direction="backward"] {
+        grid-column: 1;
+        justify-self: center;
+
+        .feedbackSeekIcon,
+        .seekIcon {
+          transform: scaleX(-1);
+        }
+      }
+
+      &[data-direction="forward"] {
+        grid-column: 3;
+        justify-self: center;
+      }
+
+      &[data-starting-style],
+      &[data-ending-style] {
+        opacity: 0;
+      }
+
+      &[data-direction="backward"][data-starting-style],
+      &[data-direction="backward"][data-ending-style] {
+        transform: translateX(-8px);
+      }
+
+      &[data-direction="forward"][data-starting-style],
+      &[data-direction="forward"][data-ending-style] {
+        transform: translateX(8px);
+      }
+    }
+  }
+
+  @container cinema-player (width < 620px) {
+    .metadata {
+      inset: 14px 15px auto;
+
+      .badge,
+      .eyebrow {
+        display: none;
+      }
+
+      .title {
+        font-size: 16px;
+      }
+    }
+
+    .controls {
+      .controlsPanel {
+        padding: 0 12px 11px;
+
+        .bottomBar {
+          min-height: 34px;
+
+          .leftControls,
+          .rightControls {
+            gap: 0;
+          }
+
+          .iconButton {
+            width: 34px;
+            height: 34px;
+
+            svg {
+              width: 19px;
+              height: 19px;
+            }
+          }
+
+          /* На маленьком плеере скрываем второстепенные элементы. */
+          .volumeSlider,
+          .timeGroup,
+          .pipButton,
+          .rateButton,
+          .seekButton {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .inputFeedback {
+      .playFeedback {
+        width: 54px;
+        height: 54px;
+      }
+
+      .seekFeedback {
+        min-width: 66px;
+        padding: 10px;
+      }
+    }
+  }
+
+  /* ================================================================
+   * ДОСТУПНОСТЬ: УМЕНЬШЕННОЕ ДВИЖЕНИЕ
+   * ================================================================ */
+
+  @media (prefers-reduced-motion: reduce) {
+    .poster,
+    .metadata,
+    .controls,
+    .centerPlayButton,
+    .timeTrack,
+    .timeThumb,
+    .timePreview,
+    .volumeSlider,
+    .playFeedback,
+    .seekFeedback {
+      transition-duration: 1ms;
+    }
+  }
+}
+
+/* Анимация spinner вынесена отдельно, потому что @keyframes не является классом. */
+@keyframes cinema-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

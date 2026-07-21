@@ -5,6 +5,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
 import { locales } from "@/types/content";
 import styles from "@/components/sections/Sections.module.scss";
+import CinemaPlayer from "@/components/players/CinemaPlayer";
 
 export function generateStaticParams() {
   return locales.flatMap((lang) =>
@@ -32,7 +33,20 @@ export default async function PlayerPage({
         <h1>{content.title}</h1>
         <p>{content.body}</p>
       </div>
-      <DemoPlayer poster={player.poster} labels={d.common} />
+      {
+        slug === "cinema" &&
+        <CinemaPlayer
+          src={player.src}
+          poster={player.poster}
+          posterAlt={player.posterAlt}
+          eyebrow={player.eyebrow}
+          title={player.title}
+          badge={player.badge}
+          captions={player.captions}
+          labels={player.labels}
+        /> ||
+        <DemoPlayer poster={player.poster} labels={d.common} />
+      }
       <div className={styles.detailGrid}>
         <div>
           <span className={styles.detailLabel}>{d.player.useCase}</span>
