@@ -345,12 +345,12 @@
         &[data-dragging] {
           .timeTrack {
             .timeFill {
-              width: var(--medai-slider-poineter);
+              width: var(--media-slider-pointer);
             }
           }
 
           .timeThumb {
-            left: var(--medai-slider-poineter);
+            left: var(--media-slider-pointer);
           }
         }
 
@@ -736,9 +736,16 @@
 
     .seekFeedback {
       /* Индикатор перемотки появляется слева или справа. */
+      grid-row: 1;
+      align-self: center;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      
       gap: 4px;
       min-width: 88px;
-      position: 14px 15px;
+      padding: 14px 15px;
       font-size: 720;
       background: rgb(0 0 0 / 40%);
       border: 1px solid rgb(255 255 255 / 12%);
