@@ -11,7 +11,7 @@
   overflow: hidden;
   color: var(--cinema-fg);
   background: #050506;
-  border-radius: clamp(2px, 0.5vw, 8px);
+  border-radius: 30px;
   box-shadow: 0 30px 80px rgb(0 0 0 / 24%);
   isolation: isolate;
   container: cinema-player / inline-size;
@@ -742,7 +742,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      
+
       gap: 4px;
       min-width: 88px;
       padding: 14px 15px;

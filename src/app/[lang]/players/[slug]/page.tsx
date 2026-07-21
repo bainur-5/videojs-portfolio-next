@@ -36,24 +36,14 @@ export default async function PlayerPage({
       {
         slug === "cinema" &&
         <CinemaPlayer
-          src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4"
-          poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2"
-          posterAlt="Mountain landscape from the cinema player demo"
-          eyebrow="Original short film"
-          title="Beyond the Ridge"
-          badge="4K"
-          captions={[
-            {
-              src: '/media/cinema-en.vtt',
-              srcLang: 'en',
-              label: 'English',
-              default: true,
-            },
-          ]}
-          labels={{
-            player: 'Cinema player demo',
-            controls: 'Video controls',
-          }}
+          src={player.src}
+          poster={player.poster}
+          posterAlt={player.posterAlt}
+          eyebrow={player.eyebrow}
+          title={player.title}
+          badge={player.badge}
+          captions={player.captions}
+          labels={player.labels}
         /> ||
         <DemoPlayer poster={player.poster} labels={d.common} />
       }
